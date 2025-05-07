@@ -2,7 +2,11 @@
 
 namespace App\Service;
 
+use App\Entity\User;
 use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Validation\Constraint\SignedWith;
+use Lcobucci\JWT\Validation\Constraint\ValidAt;
+use Lcobucci\Clock\SystemClock;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Token;
@@ -21,9 +25,14 @@ class JWTService
             InMemory::file($privateKeyPath, $passphrase),
             InMemory::file($publicKeyPath)
         );
+
+        $this->config->setValidationConstraints(
+            new SignedWith($this->config->signer(), $this->config->verificationKey()),
+            new ValidAt(new SystemClock(new \DateTimeZone('UTC')))
+        );
     }
 
-    public function createToken(string $userId, string $email): string
+    public function createToken(User $user): string
     {
         $now = new \DateTimeImmutable();
         $token = $this->config->builder()
@@ -33,8 +42,8 @@ class JWTService
             ->issuedAt($now)
             ->canOnlyBeUsedAfter($now)
             ->expiresAt($now->modify('+1 hour'))
-            ->withClaim('uid', $userId)
-            ->withClaim('email', $email)
+            ->withClaim('uid', $user->getId())
+            ->withClaim('email', $user->getUserIdentifier())
             ->getToken($this->config->signer(), $this->config->signingKey());
 
         return $token->toString();
@@ -48,7 +57,7 @@ class JWTService
     /**
      * @param mixed $token
      */
-    public function validateToken($token): bool
+    public function isTokenValid($token): bool
     {
         return $this->config->validator()->validate($token, ...$this->config->validationConstraints());
     }

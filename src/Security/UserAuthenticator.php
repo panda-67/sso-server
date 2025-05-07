@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Service\JWTService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +19,10 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
  */
 class UserAuthenticator extends AbstractAuthenticator
 {
+    public function __construct(
+        private JWTService $jwtService
+    ) {}
+
     /**
      * Called on every request to decide if this authenticator should be
      * used for the request. Returning `false` will cause this authenticator
@@ -25,23 +30,36 @@ class UserAuthenticator extends AbstractAuthenticator
      */
     public function supports(Request $request): ?bool
     {
-        // return $request->headers->has('X-AUTH-TOKEN');
+        return str_starts_with($request->getPathInfo(), '/api');
     }
 
     public function authenticate(Request $request): Passport
     {
-        // $apiToken = $request->headers->get('X-AUTH-TOKEN');
-        // if (null === $apiToken) {
-        // The token header was empty, authentication fails with HTTP Status
-        // Code 401 "Unauthorized"
-        // throw new CustomUserMessageAuthenticationException('No API token provided');
-        // }
+        $authHeader = $request->headers->get('Authorization');
+
+        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+            throw new CustomUserMessageAuthenticationException('Missing Authorization header');
+        }
 
         // implement your own logic to get the user identifier from `$apiToken`
         // e.g. by looking up a user in the database using its API key
         // $userIdentifier = /** ... */;
 
-        // return new SelfValidatingPassport(new UserBadge($userIdentifier));
+        $jwt = substr($authHeader, 7); // Remove 'Bearer '
+        $token = $this->jwtService->parseToken($jwt);
+
+        if (!$this->jwtService->isTokenValid($token)) {
+            throw new CustomUserMessageAuthenticationException('Invalid or expired token');
+        }
+
+        $claims = $token->claims();
+        $userIdentifier = $claims->get('email');
+
+        if (!$userIdentifier) {
+            throw new CustomUserMessageAuthenticationException('JWT is missing email claim');
+        }
+
+        return new SelfValidatingPassport(new UserBadge($userIdentifier);
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
