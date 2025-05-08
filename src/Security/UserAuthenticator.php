@@ -37,15 +37,11 @@ class UserAuthenticator extends AbstractAuthenticator
     {
         $authHeader = $request->headers->get('Authorization');
 
-        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
-            throw new CustomUserMessageAuthenticationException('Missing Authorization header');
+        if (!preg_match('/^Bearer\s+(.+)$/i', $authHeader ?? '', $matches)) {
+            throw new CustomUserMessageAuthenticationException('Missing or invalid Authorization header');
         }
 
-        // implement your own logic to get the user identifier from `$apiToken`
-        // e.g. by looking up a user in the database using its API key
-        // $userIdentifier = /** ... */;
-
-        $jwt = substr($authHeader, 7); // Remove 'Bearer '
+        $jwt = $matches[1];
         $token = $this->jwtService->parseToken($jwt);
 
         if (!$this->jwtService->isTokenValid($token)) {
@@ -59,7 +55,7 @@ class UserAuthenticator extends AbstractAuthenticator
             throw new CustomUserMessageAuthenticationException('JWT is missing email claim');
         }
 
-        return new SelfValidatingPassport(new UserBadge($userIdentifier);
+        return new SelfValidatingPassport(new UserBadge($userIdentifier));
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response

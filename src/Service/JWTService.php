@@ -18,7 +18,9 @@ class JWTService
     public function __construct(
         private string $privateKeyPath,
         private string $publicKeyPath,
-        private string $passphrase
+        private string $passphrase,
+        private string $audience,
+        private string $issuer,
     ) {
         $this->config = Configuration::forAsymmetricSigner(
             new Sha256(),
@@ -36,8 +38,8 @@ class JWTService
     {
         $now = new \DateTimeImmutable();
         $token = $this->config->builder()
-            ->issuedBy('https://your-sso-server.com')
-            ->permittedFor('https://your-client-app.com')
+            ->issuedBy($this->issuer)
+            ->permittedFor($this->audience)
             ->identifiedBy(bin2hex(random_bytes(16)))
             ->issuedAt($now)
             ->canOnlyBeUsedAfter($now)

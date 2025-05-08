@@ -13,20 +13,25 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 final class AuthController extends AbstractController
 {
     #[Route('/login', name: 'login', methods: ['POST'])]
-    public function index( #[CurrentUser] ?User $user, JWTService $jwtService): JsonResponse 
-    {
+    public function index(
+        #[CurrentUser] ?User $user,
+        JWTService $jwtService
+    ): JsonResponse {
         if (null === $user) {
-            return $this->json([
-                'message' => 'missing credentials',
-            ], Response::HTTP_UNAUTHORIZED);
+            return $this->json(
+                ['message' => 'missing credentials'],
+                Response::HTTP_UNAUTHORIZED
+            );
         }
 
         $token = $jwtService->createToken($user);
 
-        return $this->json([
-            'user'  => $user->getUserIdentifier(),
-            'token' => $token,
-        ]);
+        return $this->json(
+            [
+                'user'  => $user->getUserIdentifier(),
+                'token' => $token,
+            ]
+        );
     }
 
     #[Route('/api/profile', name: 'api_profile')]
@@ -35,10 +40,12 @@ final class AuthController extends AbstractController
         $user = $this->getUser(); // should be auto-injected by Symfony if token is valid
 
         if ($user) {
-            return $this->json([
-                'email' => $user->getUserIdentifier(),
-                'message' => 'You are HERE',
-            ]);
+            return $this->json(
+                [
+                    'email' => $user->getUserIdentifier(),
+                    'message' => 'You are HERE',
+                ]
+            );
         }
 
         return $this->json(['message' => 'nothing to see here']);
