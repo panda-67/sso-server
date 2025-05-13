@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+{% block title %}Hello SPA Home!{% endblock %}
+{% block body %}
+    <div data-controller="router"
+         data-action="popstate@window->router#popstate"
+         class="min-h-screen bg-gray-100 flex flex-col items-center justify-start py-2">
+        <!-- Navbar -->
+        <nav class="w-full max-w-4xl px-6 py-4 bg-white shadow flex justify-between items-center mb-4 rounded">
+            <a href="/">
+                <div class="text-xl font-bold text-emerald-700">MySPA</div>
+            </a>
+            <div class="space-x-4">
+                {% if app.user %}
+                    <a href="/auth/logout"
+                       data-action="click->router#navigate"
+                       class="text-sm text-gray-700 hover:text-red-600">Logout</a>
+                {% else %}
+                    <a href="/auth/login"
+                       data-action="click->router#navigate"
+                       class="text-sm text-gray-700 hover:text-emerald-600">Login</a>
+                    <a href="/auth/register"
+                       data-action="click->router#navigate"
+                       class="text-sm text-gray-700 hover:text-emerald-600">Register</a>
+                {% endif %}
+            </div>
+        </nav>
+        <div class="text-emerald-700 px-6 mb-4">
+            <p>Welcome to SPA page this is home page.</p>
+        </div>
+        <!-- Main SPA Container -->
+        <main id="app"
+              data-router-target="element"
+              class="w-full max-w-4xl bg-white p-6 rounded shadow">
+            {% if content is defined %}
+                {{ content|raw }}
+            {% else %}
+                <p class="text-gray-500">Loading...</p>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

@@ -17,6 +17,7 @@ class AppFixtures extends Fixture
     {
         $user = new User();
         $user->setEmail('admin@example.com');
+        $user->setIsVerified(false);
 
         $hashedPassword = $this->passwordHasher->hashPassword(
             $user,
@@ -28,4 +29,3 @@ class AppFixtures extends Fixture
         $manager->flush();
     }
 }
-

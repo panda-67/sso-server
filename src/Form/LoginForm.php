@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Form;
+
+use App\Entity\User;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class LoginForm extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('email', EmailType::class, [
+                'attr' => [
+                    'class' => 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none',
+                    'placeholder' => 'you@example.com',
+                ],
+                'label' => 'Email Address',
+                'label_attr' => ['class' => 'block text-sm font-medium text-gray-700 mb-1'],
+                'row_attr' => ['class' => 'mb-4'],
+            ])
+            ->add('password', PasswordType::class, [
+                'attr' => [
+                    'class' => 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none resize-y',
+                    'placeholder' => 'Your password...',
+                ],
+                'label' => 'Password',
+                'label_attr' => ['class' => 'block text-sm font-medium text-gray-700 mb-1'],
+                'row_attr' => ['class' => 'mb-4'],
+            ])
+            ->add('submit', SubmitType::class, [
+                'attr' => [
+                    'class' => 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-150 ease-in-out',
+                ],
+                'label' => 'Sign In',
+                'row_attr' => ['class' => 'mt-6'],
+            ])
+        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => User::class,
+        ]);
+    }
+}

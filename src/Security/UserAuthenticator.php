@@ -30,7 +30,8 @@ class UserAuthenticator extends AbstractAuthenticator
      */
     public function supports(Request $request): ?bool
     {
-        return str_starts_with($request->getPathInfo(), '/api');
+        return str_starts_with($request->getPathInfo(), '/api')
+            && $request->headers->has('Authorization');
     }
 
     public function authenticate(Request $request): Passport
@@ -50,6 +51,13 @@ class UserAuthenticator extends AbstractAuthenticator
 
         $claims = $token->claims();
         $userIdentifier = $claims->get('email');
+
+        // TODO: Remove on production
+        if ($_ENV['APP_ENV'] === 'dev') {
+            $request->attributes->set('jwt_claims', $claims); // Forward for later
+            // Or, for instant HTTPie view:
+            // throw new CustomUserMessageAuthenticationException(json_encode($claims));
+        }
 
         if (!$userIdentifier) {
             throw new CustomUserMessageAuthenticationException('JWT is missing email claim');

@@ -3,20 +3,34 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\LoginForm;
 use App\Service\JWTService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
-final class AuthController extends AbstractController
+#[Route('/auth')]
+final class AuthController extends BaseController
 {
-    #[Route('/login', name: 'login', methods: ['POST'])]
-    public function index(
-        #[CurrentUser] ?User $user,
-        JWTService $jwtService
-    ): JsonResponse {
+    #[Route('/login', name: 'app_show_login', methods: ['GET'])]
+    public function index(Request $request): Response
+    {
+        $html = $this->renderView('pages/welcome.html.twig', [
+            'loginForm' => $this->createForm(LoginForm::class)->createView(),
+        ]);
+
+        if ($request->isXmlHttpRequest()) {
+            return $this->json(['html' => $html]);
+        }
+
+        return $this->renderApp($html);
+    }
+
+    #[Route('/login', name: 'app_login', methods: ['POST'])]
+    public function login(#[CurrentUser] ?User $user, JWTService $jwtService): JsonResponse
+    {
         if (null === $user) {
             return $this->json(
                 ['message' => 'missing credentials'],
@@ -32,22 +46,5 @@ final class AuthController extends AbstractController
                 'token' => $token,
             ]
         );
-    }
-
-    #[Route('/api/profile', name: 'api_profile')]
-    public function profile(): Response
-    {
-        $user = $this->getUser(); // should be auto-injected by Symfony if token is valid
-
-        if ($user) {
-            return $this->json(
-                [
-                    'email' => $user->getUserIdentifier(),
-                    'message' => 'You are HERE',
-                ]
-            );
-        }
-
-        return $this->json(['message' => 'nothing to see here']);
     }
 }
