@@ -1,0 +1,17 @@
+<div class="container mt-5">
+    <h1 class="mb-4">Welcome, {{ app.user.email }}</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Account Details</h5>
+            <p class="card-text">
+                <strong>Email:</strong> {{ app.user.email }}
+                <br>
+                <strong>Roles:</strong> {{ app.user.roles|join(", ") }}
+                <br>
+            </p>
+            <a href="{{ path("app_logout") }}"
+               data-action="click->router#logout"
+               class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+</div>

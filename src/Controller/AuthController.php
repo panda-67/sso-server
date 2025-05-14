@@ -17,7 +17,7 @@ final class AuthController extends BaseController
     #[Route('/login', name: 'app_show_login', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        $html = $this->renderView('pages/welcome.html.twig', [
+        $html = $this->renderView('authentication/login.html.twig', [
             'loginForm' => $this->createForm(LoginForm::class)->createView(),
         ]);
 
@@ -39,12 +39,18 @@ final class AuthController extends BaseController
         }
 
         $token = $jwtService->createToken($user);
+        $navbar = $this->renderView('pages/navbar.html.twig');
 
-        return $this->json(
-            [
-                'user'  => $user->getUserIdentifier(),
-                'token' => $token,
-            ]
-        );
+        return $this->json([
+            'redirect_to' => $this->generateUrl('app_profile'),
+            'navbar' => $navbar,
+            'token' => $token,
+        ]);
+    }
+
+    #[Route('/logout', name: 'app_logout')]
+    public function logout(): void
+    {
+        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 }

@@ -112,7 +112,9 @@ export default class extends Controller {
 
 3. After first load: content is fetched via axios and inserted via this.elementTarget.innerHTML.
 
-```
+### How Controllers Return Content
+
+```php
 public function login(Request $request): Response
 {
     $html = $this->renderView('partials/login.partial.html.twig', [
@@ -130,16 +132,16 @@ public function login(Request $request): Response
 
 Logic:
 
-    AJAX request → Return { html: "...partial html..." }
+1. AJAX request → `Return { html: "...partial html..." }`
 
-    Direct browser request → Return full layout with content inserted
+2. Direct browser request → Return full layout with content inserted
 
-Preventing Reload/JSON View Issues
+### Preventing Reload/JSON View Issues
 
 If a user hard-reloads a pushed route (/auth/login), Symfony returns the full page with the layout.
 
 Ensure:
 
-    Your controller never sends JSON for non-AJAX requests
+1.  Your controller never sends JSON for non-AJAX requests
 
-    Use isXmlHttpRequest() as shown above
+2.  Use `isXmlHttpRequest()` as shown above

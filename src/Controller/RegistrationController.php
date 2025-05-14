@@ -28,7 +28,7 @@ final class RegistrationController extends BaseController
     {
         $form = $this->createForm(RegistrationForm::class);
 
-        $html = $this->renderView('registration/register.html.twig', [
+        $html = $this->renderView('authentication/register.html.twig', [
             'registrationForm' => $form->createView(),
         ]);
 

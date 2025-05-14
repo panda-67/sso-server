@@ -1,0 +1,20 @@
+<a href="/">
+    <div class="text-xl font-bold text-emerald-700">MySPA</div>
+</a>
+<div class="space-x-4">
+    {% if app.user %}
+        <a href="{{ path("app_profile") }}"
+           data-action="click->router#navigate"
+           class="text-sm text-gray-700 hover:text-emerald-600">Profile</a>
+        <a href="{{ path("app_logout") }}"
+           data-action="click->router#logout"
+           class="text-sm text-gray-700 hover:text-red-600">Logout</a>
+    {% else %}
+        <a href="{{ path("app_show_login") }}"
+           data-action="click->router#navigate"
+           class="text-sm text-gray-700 hover:text-emerald-600">Login</a>
+        <a href="{{ path("app_show_register") }}"
+           data-action="click->router#navigate"
+           class="text-sm text-gray-700 hover:text-emerald-600">Register</a>
+    {% endif %}
+</div>

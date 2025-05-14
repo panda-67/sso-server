@@ -10,5 +10,18 @@
     {{ form_row(registrationForm.email) }}
     {{ form_row(registrationForm.plainPassword, { label: 'Password' }) }}
     {{ form_row(registrationForm.agreeTerms) }}
-    <button type="submit" class="btn">Register</button>
+    <div class="flex justify-center w-full mb-3">
+        <button type="submit"
+                class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded transition duration-150 ease-in-out">
+            Register
+        </button>
+    </div>
 {{ form_end(registrationForm) }}
+<div class="flex justify-center">
+    <p class="text-xs text-slate-500">
+        Already have account?
+        <a href="{{ path("app_show_login") }}"
+           class="hover:text-blue-500"
+           data-action="click->router#navigate">Sign In</a>
+    </p>
+</div>

@@ -1,0 +1,15 @@
+<div id="login-container">
+    {{ form_start(loginForm, { attr: { class: 'space-y-4 mb-3', 'data-action': 'submit->router#submit' } }) }}
+        {{ form_row(loginForm.email) }}
+        {{ form_row(loginForm.password) }}
+        {{ form_row(loginForm.submit) }}
+    {{ form_end(loginForm) }}
+    <div class="flex justify-center">
+        <p class="text-xs text-slate-500">
+            Don't have account?
+            <a href="{{ path("app_show_register") }}"
+               class="hover:text-blue-500"
+               data-action="click->router#navigate">Register</a>
+        </p>
+    </div>
+</div>

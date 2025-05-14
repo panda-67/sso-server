@@ -13,7 +13,9 @@ abstract class BaseController extends AbstractController
      */
     protected function renderApp($content = ''): Response
     {
-        return $this->render('app.html.twig', ['content' => $content]);
+        $navbar = $this->renderView('pages/navbar.html.twig');
+
+        return $this->render('app.html.twig', ['navbar' => $navbar, 'content' => $content]);
     }
 
     /**

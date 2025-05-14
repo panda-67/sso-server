@@ -1,8 +1,9 @@
 import { Controller } from "@hotwired/stimulus";
+import { serializeFormToJson } from "./utils/form_serialize.js";
 import axios from "axios";
 
 export default class extends Controller {
-  static targets = ["element"];
+  static targets = ["navbar", "element"];
 
   connect() {
     // On first load, manually trigger GET /auth/login
@@ -15,10 +16,10 @@ export default class extends Controller {
 
   async load(url, push = true) {
     try {
-      const response = await axios.get(url);
+      const { data } = await axios.get(url);
 
-      if (response.data?.html) {
-        this.elementTarget.innerHTML = response.data.html;
+      if (data?.html) {
+        this.elementTarget.innerHTML = data.html;
 
         if (push) {
           history.pushState(null, "", url);
@@ -31,7 +32,6 @@ export default class extends Controller {
 
   popstate() {
     const target = window.location.pathname;
-    console.log("Pop:", target);
     this.load(target, false);
   }
 
@@ -43,28 +43,46 @@ export default class extends Controller {
 
   async submit(event) {
     event.preventDefault();
-
     const form = event.target;
-    const url = form.action;
-    const method = form.method.toUpperCase();
-    const formData = new FormData(form);
+    const payload = serializeFormToJson(form);
 
     try {
-      const response = await axios({
-        method,
-        url,
-        data: formData,
+      const { data } = await axios({
+        method: form.method,
+        url: form.action,
+        data: payload,
       });
 
-      const data = response.data;
+      if (data.token) {
+        localStorage.setItem("jwt", data.token);
+      }
 
-      if (data.redirect) {
-        this.load(data.redirect);
+      if (data.redirect_to) {
+        this.load(data.redirect_to);
+        if (data.navbar) {
+          this.navbarTarget.innerHTML = data.navbar;
+        }
       } else if (data.html) {
-        this.element.innerHTML = data.html;
+        this.elementTarget.innerHTML = data.html;
+      } else {
+        console.warn("Unexpected response format", data);
       }
     } catch (error) {
       console.error("Form submission failed", error);
+    }
+  }
+
+  async logout(event) {
+    event.preventDefault();
+    const url = event.currentTarget.href;
+
+    try {
+      await axios.post(url);
+      localStorage.removeItem("jwt");
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Optionally show a message to the user
     }
   }
 }

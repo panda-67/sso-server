@@ -18,6 +18,7 @@ class LoginForm extends AbstractType
             ->add('email', EmailType::class, [
                 'attr' => [
                     'class' => 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none',
+                    'data-json' => 'email',
                     'placeholder' => 'you@example.com',
                 ],
                 'label' => 'Email Address',
@@ -27,6 +28,7 @@ class LoginForm extends AbstractType
             ->add('password', PasswordType::class, [
                 'attr' => [
                     'class' => 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none resize-y',
+                    'data-json' => 'password',
                     'placeholder' => 'Your password...',
                 ],
                 'label' => 'Password',
@@ -35,10 +37,10 @@ class LoginForm extends AbstractType
             ])
             ->add('submit', SubmitType::class, [
                 'attr' => [
-                    'class' => 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-150 ease-in-out',
+                    'class' => 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded transition duration-150 ease-in-out',
                 ],
                 'label' => 'Sign In',
-                'row_attr' => ['class' => 'mt-6'],
+                'row_attr' => ['class' => 'mt-4 flex justify-center w-full'],
             ])
         ;
     }

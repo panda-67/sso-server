@@ -21,7 +21,16 @@ class RegistrationForm extends AbstractType
         $builder
             ->add('email', EmailType::class, [
                 'required' => false,
-                'attr' => ['autocomplete' => 'email'],
+                'attr' => [
+                    'class' => 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none',
+                    'autocomplete' => 'email',
+                    'data-json' => 'email',
+                    'placeholder' => 'you@example.com',
+                ],
+                'label' => 'Email Address',
+                'label_attr' => ['class' => 'block text-sm font-medium text-gray-700 mb-1'],
+                'row_attr' => ['class' => 'mb-4'],
+
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter an email',
@@ -36,7 +45,16 @@ class RegistrationForm extends AbstractType
                 // this is read and encoded in the controller
                 'mapped' => false,
                 'required' => false,
-                'attr' => ['autocomplete' => 'new-password'],
+                'attr' => [
+                    'class' => 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none resize-y',
+                    'autocomplete' => 'new-password',
+                    'data-json' => 'password',
+                    'placeholder' => 'Your password...',
+                ],
+                'label' => 'Password',
+                'label_attr' => ['class' => 'block text-sm font-medium text-gray-700 mb-1'],
+                'row_attr' => ['class' => 'mb-4'],
+
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter a password',
@@ -52,6 +70,14 @@ class RegistrationForm extends AbstractType
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
                 'required' => false,
+                'label' => 'I agree to the terms and conditions',
+                'attr' => [
+                    'class' => 'h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded',
+                ],
+                'label_attr' => [
+                    'class' => 'ml-2 block text-sm text-gray-900',
+                ],
+                'row_attr' => ['class' => 'w-full flex gap-3'],
                 'constraints' => [
                     new IsTrue([
                         'message' => 'You should agree to our terms.',

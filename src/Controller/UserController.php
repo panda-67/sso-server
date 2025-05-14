@@ -2,12 +2,11 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class UserController extends AbstractController
+final class UserController extends BaseController
 {
     #[Route('/api/profile', name: 'app_profile')]
     public function profile(Request $request): Response
@@ -22,12 +21,15 @@ final class UserController extends AbstractController
                 'X-JWT-Audience' => implode(',', $claims->get('aud'))
             ];
 
-            $data = [
-                'email' => $user->getUserIdentifier(),
-                'message' => 'You are HERE',
-            ];
+            $html = $this->renderView('pages/profile.html.twig', [
+                'user' => $user
+            ]);
 
-            return $this->json($data, 200, $headers);
+            if ($request->isXmlHttpRequest()) {
+                return $this->json(['html' => $html], 200, $headers);
+            }
+
+            return $this->renderApp($html);
         }
 
         return $this->json(['message' => 'nothing to see here']);
