@@ -9,6 +9,9 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class LoginForm extends AbstractType
 {
@@ -16,6 +19,15 @@ class LoginForm extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
+                'required' => true,
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Please enter an email',
+                    ]),
+                    new Email([
+                        'message' => 'Please enter a valid email address',
+                    ]),
+                ],
                 'attr' => [
                     'class' => 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none',
                     'data-json' => 'email',
@@ -26,6 +38,17 @@ class LoginForm extends AbstractType
                 'row_attr' => ['class' => 'mb-4'],
             ])
             ->add('password', PasswordType::class, [
+                'required' => true,
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Please enter a password',
+                    ]),
+                    new Length([
+                        'min' => 6,
+                        'minMessage' => 'Your password should be at least {{ limit }} characters',
+                        'max' => 4096,
+                    ]),
+                ],
                 'attr' => [
                     'class' => 'block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:outline-none resize-y',
                     'data-json' => 'password',
@@ -37,10 +60,10 @@ class LoginForm extends AbstractType
             ])
             ->add('submit', SubmitType::class, [
                 'attr' => [
-                    'class' => 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded transition duration-150 ease-in-out',
+                    'class' => 'inline-block bg-emerald-500 hover:bg-emerald-700 text-white font-semibold py-1 px-3 rounded transition duration-150 ease-in-out',
                 ],
                 'label' => 'Sign In',
-                'row_attr' => ['class' => 'mt-4 flex justify-center w-full'],
+                'row_attr' => ['class' => 'mt-3 flex justify-center w-full'],
             ])
         ;
     }

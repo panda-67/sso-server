@@ -18,26 +18,29 @@ export default class FormErrorHandler {
         continue;
       }
 
-      const formName = this.root.name;
-      const input = this.root.querySelector(`[id="${formName}_${field}"]`);
+      const name = this.root.name;
+      const input = this.root.querySelector(`[id="${name}_${field}"]`);
+      const parentDiv = input.parentElement;
       if (!input) continue;
 
       const errorEl = document.createElement("div");
       errorEl.className = "form-error text-xs text-red-600 mt-1";
       errorEl.textContent = messages.join(", ");
-      input.insertAdjacentElement("afterend", errorEl);
+
+      if (field === "agreeTerms") {
+        errorEl.classList.add("w-full", "flex", "justify-center", "mb-2");
+        parentDiv.insertAdjacentElement("afterend", errorEl);
+      } else {
+        input.insertAdjacentElement("afterend", errorEl);
+      }
     }
   }
 
   _showGlobal(messages) {
-    const html = document.createElement("p");
-    html.className = "text-sm text-red-600 mt-1";
-    html.innerHTML = messages.join("<br>");
-
     Swal.fire({
       icon: "warning",
-      title: "Form Submission Failed",
-      html: html,
+      title: " Failed",
+      html: messages.join("<br>"),
     });
   }
 }

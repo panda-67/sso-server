@@ -35,58 +35,97 @@ import { Controller } from "@hotwired/stimulus";
 import axios from "axios";
 
 export default class extends Controller {
-  static targets = ["element"];
+  static targets = ["navbar", "element"];
+
+  initialize() {
+    this.errorHandler = new FormErrorHandler(this.elementTarget);
+    this.jwt = localStorage.getItem("jwt");
+  }
 
   connect() {
     if (window.location.pathname === "/") {
-      this.load("/auth/login", false);
+      const redirect = this.jwt ? "/api/profile" : "/auth/login";
+      this.load(redirect);
     } else {
       this.load(window.location.pathname, false);
     }
-
-    window.addEventListener("popstate", this.popstate.bind(this));
   }
 
   async load(url, push = true) {
     try {
-      const response = await axios.get(url);
-      if (response.data?.html) {
-        this.elementTarget.innerHTML = response.data.html;
-        if (push) history.pushState(null, "", url);
+      const { data } = await axios.get(url);
+
+      if (data?.html) {
+        this.elementTarget.innerHTML = data.html;
+
+        if (push) {
+          history.pushState(null, "", url);
+        }
       }
     } catch (error) {
-      console.error("Load failed:", url, error);
+      console.error("Failed to load", url, error);
     }
   }
 
   popstate() {
-    this.load(window.location.pathname, false);
+    const target = window.location.pathname;
+    this.load(target, false);
   }
 
   navigate(event) {
     event.preventDefault();
-    this.load(event.currentTarget.href);
+    const url = event.currentTarget.href;
+    this.load(url);
   }
 
   async submit(event) {
     event.preventDefault();
     const form = event.target;
-    const data = new FormData(form);
+    const payload = serializeFormToJson(form);
 
     try {
-      const response = await axios({
+      const { data } = await axios({
         method: form.method,
         url: form.action,
-        data,
+        data: payload,
       });
 
-      if (response.data?.redirect) {
-        this.load(response.data.redirect);
-      } else if (response.data?.html) {
-        this.elementTarget.innerHTML = response.data.html;
+      if (data.token) {
+        localStorage.setItem("jwt", data.token);
+      }
+
+      if (data.redirect_to) {
+        this.load(data.redirect_to);
+        if (data.navbar) {
+          this.navbarTarget.innerHTML = data.navbar;
+        }
+      } else if (data.html) {
+        this.elementTarget.innerHTML = data.html;
+      } else {
+        console.warn("Unexpected response format", data);
       }
     } catch (error) {
-      console.error("Form submit failed:", error);
+      if (error.response && error.response.status === 401) {
+        // Login failed — show error
+        const message = error.response.data?.message || "Login failed";
+        this.errorHandler._showGlobal([message]);
+      } else {
+        console.error("Form submission failed", error);
+      }
+    }
+  }
+
+  async logout(event) {
+    event.preventDefault();
+    const url = event.currentTarget.href;
+
+    try {
+      await axios.post(url);
+      localStorage.removeItem("jwt");
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Optionally show a message to the user
     }
   }
 }

@@ -18,9 +18,17 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      window.location.href = "/"; // optional fallback
+    const { config, response } = error;
+
+    if (response && response.status === 401) {
+      const isLoginRequest =
+        config && config.url && config.url.includes("/login");
+
+      if (!isLoginRequest) {
+        window.location.href = "/"; // optional fallback
+      }
     }
+
     return Promise.reject(error);
   },
 );

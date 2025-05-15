@@ -1,14 +1,20 @@
 import { Controller } from "@hotwired/stimulus";
+import FormErrorHandler from "./utils/form_error_handler.js";
 import { serializeFormToJson } from "./utils/form_serialize.js";
 import axios from "axios";
 
 export default class extends Controller {
   static targets = ["navbar", "element"];
 
+  initialize() {
+    this.errorHandler = new FormErrorHandler(this.elementTarget);
+    this.jwt = localStorage.getItem("jwt");
+  }
+
   connect() {
-    // On first load, manually trigger GET /auth/login
     if (window.location.pathname === "/") {
-      this.load("/auth/login");
+      const redirect = this.jwt ? "/api/profile" : "/auth/login";
+      this.load(redirect);
     } else {
       this.load(window.location.pathname, false);
     }
@@ -68,7 +74,13 @@ export default class extends Controller {
         console.warn("Unexpected response format", data);
       }
     } catch (error) {
-      console.error("Form submission failed", error);
+      if (error.response && error.response.status === 401) {
+        // Login failed — show error
+        const message = error.response.data?.message || "Login failed";
+        this.errorHandler._showGlobal([message]);
+      } else {
+        console.error("Form submission failed", error);
+      }
     }
   }
 

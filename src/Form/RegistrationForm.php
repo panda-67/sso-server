@@ -30,7 +30,6 @@ class RegistrationForm extends AbstractType
                 'label' => 'Email Address',
                 'label_attr' => ['class' => 'block text-sm font-medium text-gray-700 mb-1'],
                 'row_attr' => ['class' => 'mb-4'],
-
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter an email',
@@ -54,7 +53,6 @@ class RegistrationForm extends AbstractType
                 'label' => 'Password',
                 'label_attr' => ['class' => 'block text-sm font-medium text-gray-700 mb-1'],
                 'row_attr' => ['class' => 'mb-4'],
-
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter a password',
@@ -75,12 +73,12 @@ class RegistrationForm extends AbstractType
                     'class' => 'h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded',
                 ],
                 'label_attr' => [
-                    'class' => 'ml-2 block text-sm text-gray-900',
+                    'class' => 'ml-2 block text-xs text-slate-700',
                 ],
-                'row_attr' => ['class' => 'w-full flex gap-3'],
+                'row_attr' => ['class' => 'w-full flex flex-row-reverse justify-center mb-2'],
                 'constraints' => [
                     new IsTrue([
-                        'message' => 'You should agree to our terms.',
+                        'message' => 'You should agree to our terms and conditions.',
                     ]),
                 ],
             ])
