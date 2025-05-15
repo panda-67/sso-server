@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}Hello SPA Home!{% endblock %}
+{% block title %}{{ title ?? 'Hello SPA Home!' }}{% endblock %}
 {% block body %}
     <div data-controller="router"
          data-action="popstate@window->router#popstate"

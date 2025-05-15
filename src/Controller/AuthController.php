@@ -17,28 +17,23 @@ final class AuthController extends BaseController
     #[Route('/login', name: 'app_show_login', methods: ['GET'])]
     public function index(Request $request): Response
     {
+        $title = 'Login';
         $form = $this->createForm(LoginForm::class);
 
         $html = $this->renderView('authentication/login.html.twig', [
             'loginForm' => $form->createView(),
         ]);
 
-        if ($request->isXmlHttpRequest()) {
-            return $this->json(['html' => $html]);
+        if ($request->isXmlHttpRequest() || $request->getPreferredFormat() === 'json') {
+            return $this->json(['title' => $title, 'html' => $html]);
         }
 
-        return $this->renderApp($html);
+        return $this->renderApp($html, $title);
     }
 
     #[Route('/login', name: 'app_login', methods: ['POST'])]
     public function login(#[CurrentUser] ?User $user, JWTService $jwtService): JsonResponse
     {
-        $form = $this->createForm(LoginForm::class, $user);
-
-        if ($form->isSubmitted() && !$form->isValid()) {
-            return $this->json(['errors' => $this->getFormErrors($form)], 400);
-        }
-
         if (null === $user) {
             return $this->json(
                 ['message' => 'missing credentials'],

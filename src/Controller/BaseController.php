@@ -10,12 +10,17 @@ abstract class BaseController extends AbstractController
 {
     /**
      * @param mixed $content
+     * @param mixed $title
      */
-    protected function renderApp($content = ''): Response
+    protected function renderApp($content = '', $title = 'Welcome'): Response
     {
         $navbar = $this->renderView('pages/navbar.html.twig');
 
-        return $this->render('app.html.twig', ['navbar' => $navbar, 'content' => $content]);
+        return $this->render('app.html.twig', [
+            'title' => "PMED | $title",
+            'navbar' => $navbar,
+            'content' => $content
+        ]);
     }
 
     /**

@@ -26,17 +26,18 @@ final class RegistrationController extends BaseController
     #[Route('/auth/register', name: 'app_show_register', methods: ['GET'])]
     public function showRegister(Request $request): Response
     {
+        $title = 'Register';
         $form = $this->createForm(RegistrationForm::class);
 
         $html = $this->renderView('authentication/register.html.twig', [
             'registrationForm' => $form->createView(),
         ]);
 
-        if ($request->isXmlHttpRequest()) {
-            return $this->json(['html' => $html]);
+        if ($request->isXmlHttpRequest() || $request->getPreferredFormat() === 'json') {
+            return $this->json(['title' => $title, 'html' => $html]);
         }
 
-        return $this->renderApp($html);
+        return $this->renderApp($html, $title);
     }
 
     #[Route('/auth/register', name: 'app_register', methods: ['POST'])]

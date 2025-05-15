@@ -26,6 +26,7 @@ export default class extends Controller {
 
       if (data?.html) {
         this.elementTarget.innerHTML = data.html;
+        document.title = `PMED | ${data.title ?? "Welcome"}`;
 
         if (push) {
           history.pushState(null, "", url);

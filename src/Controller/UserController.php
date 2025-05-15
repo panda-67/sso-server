@@ -11,6 +11,7 @@ final class UserController extends BaseController
     #[Route('/api/profile', name: 'app_profile')]
     public function profile(Request $request): Response
     {
+        $title = 'Profile';
         $user = $this->getUser(); // should be auto-injected by Symfony if token is valid
 
         if ($user) {
@@ -25,11 +26,11 @@ final class UserController extends BaseController
                 'user' => $user
             ]);
 
-            if ($request->isXmlHttpRequest()) {
-                return $this->json(['html' => $html], 200, $headers);
+            if ($request->isXmlHttpRequest() || $request->getPreferredFormat() === 'json') {
+                return $this->json(['title' => $title, 'html' => $html], 200, $headers);
             }
 
-            return $this->renderApp($html);
+            return $this->renderApp($html, $title);
         }
 
         return $this->json(['message' => 'nothing to see here']);
