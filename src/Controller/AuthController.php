@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\LoginForm;
 use App\Service\JWTService;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,11 +45,22 @@ final class AuthController extends BaseController
         $token = $jwtService->createToken($user);
         $navbar = $this->renderView('pages/navbar.html.twig');
 
-        return $this->json([
+        $response = $this->json([
             'redirect_to' => $this->generateUrl('app_profile'),
             'navbar' => $navbar,
-            'token' => $token,
+            /* 'token' => $token, // expose to XSS */
         ]);
+
+        $cookie = Cookie::create('jwt', $token)
+            ->withHttpOnly(true)
+            ->withSecure(true)                 // only for HTTPS
+            ->withSameSite('None')             // or 'None' if doing cross-site cookies + CORS
+            ->withPath('/')
+            /* ->withDomain('.example.com')        // <-- Adjust this to your shared root domain! */;
+
+        $response->headers->setCookie($cookie);
+
+        return $response;
     }
 
     #[Route('/logout', name: 'app_logout')]
