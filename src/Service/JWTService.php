@@ -44,7 +44,7 @@ class JWTService
             ->issuedAt($now)
             ->canOnlyBeUsedAfter($now)
             ->expiresAt($now->modify('+1 hour'))
-            ->withClaim('uid', $user->getId())
+            ->relatedTo((string) $user->getId())
             ->withClaim('email', $user->getUserIdentifier())
             ->getToken($this->config->signer(), $this->config->signingKey());
 

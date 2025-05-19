@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 #[Route('/auth')]
@@ -52,11 +53,12 @@ final class AuthController extends BaseController
         ]);
 
         $cookie = Cookie::create('jwt', $token)
+            ->withExpires(time() + 3600)      // 1 hour
             ->withHttpOnly(true)
-            ->withSecure(true)                 // only for HTTPS
-            ->withSameSite('None')             // or 'None' if doing cross-site cookies + CORS
+            ->withSecure(true)                // only for HTTPS
+            ->withSameSite('Lax')             // or 'None' if doing cross-site cookies + CORS
             ->withPath('/')
-            /* ->withDomain('.example.com')        // <-- Adjust this to your shared root domain! */;
+            /* ->withDomain('.example.com')   // <-- Adjust this to your shared root domain! */;
 
         $response->headers->setCookie($cookie);
 
@@ -67,5 +69,18 @@ final class AuthController extends BaseController
     public function logout(): void
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    }
+
+    #[Route('/me', name: 'auth_me', methods: ['GET'])]
+    public function me(?UserInterface $user): JsonResponse
+    {
+        if (!$user) {
+            return new JsonResponse(['message' => 'Unauthenticated'], 401);
+        }
+
+        return new JsonResponse([
+            'id' => $user->getId(),
+            'email' => $user->getUserIdentifier(),
+        ]);
     }
 }

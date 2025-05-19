@@ -1,0 +1,39 @@
+{% extends "base.html.twig" %}
+{% block title %}OIDC | Login{% endblock %}
+{% block body %}
+    {% set input_class = "mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" %}
+    <form action="{{ path("oidc_login") }}"
+          method="post"
+          class="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow-md space-y-4">
+        <div>
+            <label for="username" class="block text-sm font-medium text-gray-700">Email</label>
+            <input id="username"
+                   type="text"
+                   name="_username"
+                   value="{{ last_username }}"
+                   class="{{ input_class }}"
+                   required>
+        </div>
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input id="password"
+                   type="password"
+                   name="_password"
+                   class="{{ input_class }}"
+                   required>
+        </div>
+
+        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+        {% if error %}
+            <div class="text-red-600 text-sm">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        <button type="submit"
+                class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded hover:bg-indigo-700 transition">
+            Login
+        </button>
+    </form>
+{% endblock %}

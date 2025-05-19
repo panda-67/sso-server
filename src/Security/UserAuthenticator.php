@@ -33,18 +33,23 @@ class UserAuthenticator extends AbstractAuthenticator implements AuthenticationE
     public function supports(Request $request): ?bool
     {
         return str_starts_with($request->getPathInfo(), '/api')
-            && $request->headers->has('Authorization');
+            && $request->cookies->has('jwt');
     }
 
     public function authenticate(Request $request): Passport
     {
-        $authHeader = $request->headers->get('Authorization');
+        // $authHeader = $request->headers->get('Authorization');
 
-        if (!preg_match('/^Bearer\s+(.+)$/i', $authHeader ?? '', $matches)) {
-            throw new CustomUserMessageAuthenticationException('Missing or invalid Authorization header');
+        // if (!preg_match('/^Bearer\s+(.+)$/i', $authHeader ?? '', $matches)) {
+        //     throw new CustomUserMessageAuthenticationException('Missing or invalid Authorization header');
+        // }
+
+        // $jwt = $matches[1];
+
+        if (!$jwt = $request->cookies->get('jwt')) {
+            throw new CustomUserMessageAuthenticationException('Missing or invalid Authorization token');
         }
 
-        $jwt = $matches[1];
         $token = $this->jwtService->parseToken($jwt);
 
         if (!$this->jwtService->isTokenValid($token)) {
